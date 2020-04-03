@@ -224,6 +224,7 @@ public class ProposeBatch extends Thread {
 		for (int i = 0; i < reqList.size(); i++) {
 			PendingProposal pendingProposal = reqList.get(i);
 			pendingProposal.setBatchIndex(i);
+			pendingProposal.setInstanceID(pResult.getInstanceID());
 			try {
 				pendingProposal.getNotifier().sendNotify(pResult.getResult());
 			} catch (IOException e) {
