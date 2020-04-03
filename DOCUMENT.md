@@ -1,6 +1,8 @@
 # WPaxos项目结构
 <img src="img/structure.png" width = 50% height = 50% />
+
 ## PNode
+
 WPaxos服务集群包括多个独立运行的Node物理节点，每个Node节点有固定数量的Paxos Group，每个group下运行一个Paxos实例，多个Paxos Group可以同时确定多组instanceID递增的有序序列，Paxos实例每确定一个值并提交至状态机执行成功，则instanceID增加1，一旦一个instanceID对应的值被确定，之后不会被修改。
 ## Logstorage
 存储模块业务可自定义实现。为了保证任何情况下已提交的instance数据不丢，Node节点日志存储PaxosLog需要实时持久化存储Acceptor已接受的所有instance数据，并且每条instance数据需支持随机读取。为此，WPaxos默认PaxosLog存储由物理文件和IndexDB索引两部分构成，如下图所示，IndexDB默认采用LevelDB实现，physiclog采用文件顺序追加写+同步刷盘方式，IndexDB则采用异步刷盘，当进程异常挂掉时，只要保证physiclog数据不丢，即可通过PaxosLog重放，恢复IndexDB中的索引数。  
