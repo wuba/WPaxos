@@ -149,12 +149,12 @@ public class EchoSMCtx {
 如下，是EchoServer类，用于封装Paxos node初始化、启动或其它接口调用：
 ```
 public class EchoServer {
-    private NodeInfo myNode;
-    private List<NodeInfo> nodeList;
-    private String rootPath;
-    private Node paxosNode;
-    private IndexType indexType;
-    private int groupCount;
+	private NodeInfo myNode;
+    	private List<NodeInfo> nodeList;
+    	private String rootPath;
+    	private Node paxosNode;
+    	private IndexType indexType;
+    	private int groupCount;
 
 	public EchoServer(NodeInfo myNode, List<NodeInfo> nodeList, int groupCount, String rootPath, int indexType) {
 		this.myNode = myNode;
@@ -208,21 +208,21 @@ GroupSMInfo类代表一个Paxos实例的状态机列表，其中groupIdx标识Pa
 我们通过echo()方法，来发起请求
 ```
 public String echo(String echoReqValue, int groupIdx) throws Exception {
-		SMCtx ctx = new SMCtx();
-		EchoSMCtx echoSMctx = new EchoSMCtx();
-		ctx.setSmId(EchoSM.SMID);
-		ctx.setpCtx(echoSMctx);
+	SMCtx ctx = new SMCtx();
+	EchoSMCtx echoSMctx = new EchoSMCtx();
+	ctx.setSmId(EchoSM.SMID);
+	ctx.setpCtx(echoSMctx);
 
-		this.paxosNode.setTimeoutMs(3000);
-		ProposeResult proposeResult = null;
-		proposeResult = this.paxosNode.propose(groupIdx, echoReqValue.getBytes(), ctx);
+	this.paxosNode.setTimeoutMs(3000);
+	ProposeResult proposeResult = null;
+	proposeResult = this.paxosNode.propose(groupIdx, echoReqValue.getBytes(), ctx);
 
-		if (PaxosTryCommitRet.PaxosTryCommitRet_OK.getRet() == proposeResult.getResult() && echoSMctx.getEchoRespValue() != null) {
-			return new String(echoSMctx.getEchoRespValue());
-		}
-		
-		return null;
+	if (PaxosTryCommitRet.PaxosTryCommitRet_OK.getRet() == proposeResult.getResult() && echoSMctx.getEchoRespValue() != null) {
+		return new String(echoSMctx.getEchoRespValue());
 	}
+		
+	return null;
+}
 
 ```
 首先定义上下文类型EchoSMCtx，然后设置到SMCtx的pCtx变量中，同时设置smID=1，标识请求数据要由smID=1的状态机来执行。
@@ -260,11 +260,11 @@ Master是一个十分实用的功能，在多数的分布式系统中，一般�
 首先构建一个选举类：
 ```
 public class ElectionServer {
-    private NodeInfo myNode;
-    private List<NodeInfo> nodeList;
-    private String rootPath;
-    private Node paxosNode;
-    private int groupCount;
+    	private NodeInfo myNode;
+    	private List<NodeInfo> nodeList;
+    	private String rootPath;
+    	private Node paxosNode;
+    	private int groupCount;
 
 	public ElectionServer(NodeInfo myNode, List<NodeInfo> nodeList, int groupCount, String rootPath) {
 		this.myNode = myNode;
