@@ -149,7 +149,7 @@ public class EchoSMCtx {
 如下，是EchoServer类，用于封装Paxos node初始化、启动或其它接口调用：
 ```
 public class EchoServer {
-	private NodeInfo myNode;
+    private NodeInfo myNode;
     private List<NodeInfo> nodeList;
     private String rootPath;
     private Node paxosNode;
