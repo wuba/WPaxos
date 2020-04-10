@@ -260,8 +260,7 @@ Master是一个十分实用的功能，在多数的分布式系统中，一般�
 首先构建一个选举类：
 ```
 public class ElectionServer {
-
-	private NodeInfo myNode;
+    private NodeInfo myNode;
     private List<NodeInfo> nodeList;
     private String rootPath;
     private Node paxosNode;
