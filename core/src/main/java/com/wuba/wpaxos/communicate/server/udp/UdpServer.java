@@ -65,7 +65,7 @@ public class UdpServer implements IServer {
 	 * @throws Exception 
 	 */
 	private void initUdpServer(String ip, int port) throws Exception {
-		DatagramChannelFactory udpChannelFactory = new NioDatagramChannelFactory(Executors.newCachedThreadPool(), 2);
+		DatagramChannelFactory udpChannelFactory = new NioDatagramChannelFactory(Executors.newCachedThreadPool(), config.getWorkerCountUdp());
 		bootstrap = new ConnectionlessBootstrap(udpChannelFactory);
 		bootstrap.setOption("sendBufferSize", config.getSendBufferSizeUdp());
 		bootstrap.setOption("receiveBufferSize", config.getRecvBufferSizeUdp());//1024*1024*15

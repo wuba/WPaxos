@@ -24,13 +24,13 @@ public class ServerConfig {
 	private NetWork network = null;
 	
 	/*TCP*/
-	private int recvBufferSizeTcp = 524288;
-	private int sendBufferSizeTcp = 524288;
+	private int recvBufferSizeTcp = 5242880;
+	private int sendBufferSizeTcp = 5242880;
 	private int maxPakageSizeTcp = 10485760;
 
 	private int writeBufferHighWaterMark = 7340032;
 	private int writeBufferLowWaterMark = 3145728;
-	private int workerCountTcp = 8;
+	private int workerCountTcp = 8; 
 	private String sListenIp;
 	private int listenPort;
 	
@@ -38,7 +38,7 @@ public class ServerConfig {
 	private int recvBufferSizeUdp = 1024 * 1024 * 32;
 	private int sendBufferSizeUdp = 1024 * 1024 * 32;
 	private int maxPakageSizeUdp = 1024 * 1024 * 32;
-	private int workerCountUdp = 1;
+	private int workerCountUdp = 8;
 	
 	private static ServerConfig instance = new ServerConfig();
 	

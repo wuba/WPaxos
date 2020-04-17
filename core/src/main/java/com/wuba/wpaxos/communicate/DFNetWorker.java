@@ -73,6 +73,7 @@ public class DFNetWorker extends NetWork {
 		ServerConfig serverConfig = ServerConfig.getInstance();
 		ClientConfig clientConfig = ClientConfig.getInstance();
 		serverConfig.setWorkerCountTcp(iOThreadCount);
+		serverConfig.setWorkerCountUdp(iOThreadCount);
 		serverConfig.setsListenIp(options.getMyNode().getIp());
 		serverConfig.setListenPort(options.getMyNode().getPort());
 		serverConfig.setNetwork(this);
