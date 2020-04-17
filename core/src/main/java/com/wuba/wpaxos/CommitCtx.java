@@ -145,9 +145,6 @@ public class CommitCtx {
 			long start = OtherUtils.getSystemMS();
 			while (!isCommitEnd) {
 				this.serialLock.waitTime(1000);
-				if (timeoutMs > 0 && (OtherUtils.getSystemMS() - start > (timeoutMs + 500))) {
-					break;
-				}
 			}
 			
 			if (this.commitRet == 0) {

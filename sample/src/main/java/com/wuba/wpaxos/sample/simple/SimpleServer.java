@@ -46,7 +46,7 @@ public class SimpleServer {
 		this.groupCount = groupCount;
 		this.useBatchPropose = useBatch;
 		this.batchCount = batchCount;
-		this.rootPath = rootPath + File.separator + myNode.getNodeID();
+		this.rootPath = rootPath + File.separator + "db" + File.separator + myNode.getNodeID();
 		if (indexType == IndexType.LEVEL_DB.getType()) {
 			this.indexType = IndexType.LEVEL_DB;
 		} else {
@@ -104,7 +104,7 @@ public class SimpleServer {
 		if (rootPath == null) {
 			rootPath = System.getProperty("user.dir"); 
 		}
-		String logStoragePath = rootPath + File.separator + myNode.getNodeID() + File.separator + "db";
+		String logStoragePath = rootPath + File.separator + "db" + File.separator  + myNode.getNodeID() + File.separator + "db";
 		File file = new File(logStoragePath);
 		file.mkdirs();
 		return logStoragePath;

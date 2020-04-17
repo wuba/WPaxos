@@ -113,16 +113,16 @@ public class SystemVSM implements InsideSM {
 			logger.error("modify.gid {} not equal to now.gid {}.", variables.getGid(), this.systemVariables.getGid());
 			if (smCtx != null && smCtx.getpCtx() != null) {
 				smCtx.setpCtx(PaxosNodeFunctionRet.Paxos_MembershipOp_GidNotSame.getRet());
-				return true;
 			}
+			return true;
 		}
 
 		if (variables.getVersion() != this.systemVariables.getVersion()) {
 			logger.error("modify.version {} not equal to now.version {}.", variables.getVersion(), this.systemVariables.getVersion());
 			if (smCtx != null && smCtx.getpCtx() != null) {
 				smCtx.setpCtx(PaxosNodeFunctionRet.Paxos_MembershipOp_VersionConflit.getRet());
-				return true;
 			}
+			return true;
 		}
 
 		variables.setVersion(instanceID);
