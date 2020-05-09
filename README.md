@@ -334,3 +334,8 @@ paxosNode.removeMember(groupIdx, node);
 ## 开源许可
 WPaxos 基于 [Apache License 2.0](./LICENSE) 开源协议，源码中引用了开源协议同为 Apache License 2.0 的[Apache RocketMQ](https://github.com/apache/rocketmq/tree/master/store)存储部分关于文件管理相关的代码。
 
+## 联系我们  
+<img src="img/wpaxos-wechat.jpg"/>  
+欢迎添加wpaxos助手微信账号，加入wpaxos技术讨论群~
+
+
