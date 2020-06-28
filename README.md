@@ -1,3 +1,4 @@
+[README in English](README-EN.md)
 # WPaxos
 
 WPaxos是Paxos一致性算法的生产级高性能Java实现，参考了微信团队C++语言开发的[PhxPaxos](https://github.com/Tencent/phxpaxos)类库，支持多分组，可用于解决高并发、高可靠分布式系统中多副本数据一致性问题以及分布式共识问题。针对一些网络分区、机器宕机、进程异常（OOM、卡顿、强制关闭）等突发情况，已经过一系列实际应用场景的验证。
