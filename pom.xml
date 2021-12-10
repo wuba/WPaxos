@@ -11,7 +11,7 @@
     </modules>
     <properties>
         <protobuf.verison>2.6.1</protobuf.verison>
-        <log4j.version>2.13.3</log4j.version>
+        <log4j.version>2.15.0</log4j.version>
         <netty.version>3.9.9.Final</netty.version>
         <guava.version>27.0-jre</guava.version>
         <fastjson.verison>1.2.53</fastjson.verison>
