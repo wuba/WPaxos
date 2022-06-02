@@ -33,7 +33,7 @@ import com.wuba.wpaxos.utils.TimeStat;
  * Committer
  */
 public class Committer {
-	private final Logger logger = LogManager.getLogger(Committer.class); 
+	private final Logger logger = LogManager.getLogger(Committer.class);
 	private Config config;
 	private CommitCtx commitCtx;
 	private IoLoop ioLoop;
@@ -41,7 +41,7 @@ public class Committer {
 	private WaitLock waitLock = new WaitLock();
 	private int timeoutMs;
 	private long lastLogTime;
-	
+
 	public Committer(Config config, CommitCtx commitCtx, IoLoop ioLoop, SMFac smFac,int commitTimeout) {
 		super();
 		this.config = config;
@@ -51,20 +51,24 @@ public class Committer {
 		this.timeoutMs = commitTimeout;
 		this.lastLogTime = OtherUtils.getSystemMS();
 	}
-	
+
 	public CommitResult newValueGetID(byte[] sValue, JavaOriTypeWrapper<Long> instanceIdWrap) {
 		return newValueGetID(sValue, instanceIdWrap, null);
 	}
-	
+
 	public CommitResult newValueGetID(byte[] sValue, JavaOriTypeWrapper<Long> instanceIdWrap, SMCtx smCtx) {
+		return newValueGetID(sValue, instanceIdWrap, smCtx, this.timeoutMs);
+	}
+
+	public CommitResult newValueGetID(byte[] sValue, JavaOriTypeWrapper<Long> instanceIdWrap, SMCtx smCtx, int timeout) {
 		Breakpoint.getInstance().getCommiterBP().newValue(this.config.getMyGroupIdx());
 		CommitResult commitRet = new CommitResult(PaxosTryCommitRet.PaxosTryCommitRet_OK.getRet(), instanceIdWrap.getValue());
 		int retryCount = 3;
 		while (retryCount > 0) {
 			TimeStat timestat = new TimeStat();
 			timestat.point();
-			
-			commitRet = newValueGetIDNoRetry(sValue, instanceIdWrap, smCtx);
+
+			commitRet = newValueGetIDNoRetry(sValue, instanceIdWrap, smCtx, timeout);
 			if (commitRet.getCommitRet() != PaxosTryCommitRet.PaxosTryCommitRet_Conflict.getRet()) {
 				if (commitRet.getCommitRet() == 0) {
 					Breakpoint.getInstance().getCommiterBP().newValueCommitOK(timestat.point(), this.config.getMyGroupIdx());
@@ -73,9 +77,9 @@ public class Committer {
 				}
 				break;
 			}
-			
+
 			Breakpoint.getInstance().getCommiterBP().newValueConflict(this.config.getMyGroupIdx(), instanceIdWrap.getValue());
-			
+
 			if (smCtx != null && smCtx.getSmId() == Def.MASTER_V_SMID) {
 				break;
 			}
@@ -84,16 +88,16 @@ public class Committer {
 
 		return commitRet;
 	}
-	
-	public CommitResult newValueGetIDNoRetry(byte[] sValue, JavaOriTypeWrapper<Long> instanceIdWrap, SMCtx smCtx) {
+
+	public CommitResult newValueGetIDNoRetry(byte[] sValue, JavaOriTypeWrapper<Long> instanceIdWrap, SMCtx smCtx, int timeoutMs) {
 		logStatus();
 		CommitResult commitRet = new CommitResult(-1, instanceIdWrap.getValue());
 		int lockUseTimeMS = 0;
 		long beginLock = OtherUtils.getSystemMS();
-		boolean hasLock = this.waitLock.lock(this.timeoutMs);
+		boolean hasLock = this.waitLock.lock(timeoutMs);
 		long endLock = OtherUtils.getSystemMS();
-		lockUseTimeMS = (int) (hasLock && (endLock > beginLock) ? (endLock - beginLock) : 0);
-		
+		lockUseTimeMS = (int) ((endLock > beginLock) ? (endLock - beginLock) : 0);
+
 		if (!hasLock) {
 			if (lockUseTimeMS > 0) {
 				Breakpoint.getInstance().getCommiterBP().newValueGetLockTimeout(this.config.getMyGroupIdx());
@@ -111,63 +115,63 @@ public class Committer {
 				return commitRet;
 			}
 		}
-		
+
 		int leftTimeoutMS = -1;
-		if (this.timeoutMs > 0) {
-			leftTimeoutMS = this.timeoutMs > lockUseTimeMS ? (this.timeoutMs - lockUseTimeMS) : 0;
+		if (timeoutMs > 0) {
+			leftTimeoutMS = timeoutMs > lockUseTimeMS ? (timeoutMs - lockUseTimeMS) : 0;
 			if (leftTimeoutMS < 200) {
 				logger.error("get lock ok, but lockusetime {} too long, lefttimeout {}.", lockUseTimeMS, leftTimeoutMS);
-				
+
 				Breakpoint.getInstance().getCommiterBP().newValueGetLockTimeout(this.config.getMyGroupIdx());
 				this.waitLock.unLock();
 				commitRet.setCommitRet(PaxosTryCommitRet.PaxosTryCommitRet_Timeout.getRet());
 				return commitRet;
 			}
 		}
-		
+
 		logger.debug("getlock ok, use time {}.", lockUseTimeMS);
-		
+
 		Breakpoint.getInstance().getCommiterBP().newValueCommitOK(lockUseTimeMS, this.config.getMyGroupIdx());
-		
+
 		int smID = smCtx != null ? smCtx.getSmId() : 0;
-		
+
 		byte[] packSMIDValue = this.smFac.packPaxosValue(sValue, sValue.length, smID);
-		
+
 		this.commitCtx.newCommit(packSMIDValue, smCtx, leftTimeoutMS);
 		this.ioLoop.addNotify();
-		
+
 		commitRet = this.commitCtx.getResult();
 		instanceIdWrap.setValue(commitRet.getSuccInstanceID());
-		
-		this.waitLock.unLock();	
-		return commitRet;	
+
+		this.waitLock.unLock();
+		return commitRet;
 	}
-	
+
 	public int newValue(byte[] sValue) {
 		JavaOriTypeWrapper<Long> instanceIdWrap = new JavaOriTypeWrapper<Long>();
 		instanceIdWrap.setValue(0L);
 		CommitResult commitRet = newValueGetID(sValue, instanceIdWrap, null);
 		return commitRet.getCommitRet();
 	}
-	
+
 	public void setTimeoutMs(int timeoutMs) {
 		this.timeoutMs = timeoutMs;
 	}
-	
+
 	public void setMaxHoldThreads(int maxHoldThreads) {
 		this.waitLock.setMaxWaitLogCount(maxHoldThreads);
 	}
-	
+
 	public void setProposeWaitTimeThresholdMS(int waitTimeThresholdMS) {
 		this.waitLock.setLockWaitTimeThreshold(waitTimeThresholdMS);
 	}
-	
+
 	public void logStatus() {
 		long nowTime = OtherUtils.getSystemMS();
 		if (nowTime > this.lastLogTime && nowTime - this.lastLogTime > 30000) {
 			this.lastLogTime = nowTime;
 			logger.info("wait threads {} avg thread wait ms {} reject rate {}, groupIdx {} wait threads set {}.", this.waitLock.getNowHoldThreadCount(), this.waitLock.getNowAvgThreadWaitTime(),
-	                this.waitLock.getNowRejectRate(), this.config.getMyGroupIdx(), this.waitLock.getWaitThdSet());
+					this.waitLock.getNowRejectRate(), this.config.getMyGroupIdx(), this.waitLock.getWaitThdSet());
 		}
 	}
 }

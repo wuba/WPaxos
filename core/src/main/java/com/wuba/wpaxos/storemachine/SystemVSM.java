@@ -31,10 +31,7 @@ import com.wuba.wpaxos.store.LogStorage;
 import com.wuba.wpaxos.store.SystemVariablesStore;
 import com.wuba.wpaxos.utils.JavaOriTypeWrapper;
 
-import java.util.HashSet;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 /**
  * group membership wrapper
@@ -50,7 +47,7 @@ public class SystemVSM implements InsideSM {
 	private long myNodeID;
 	private MembershipChangeCallback memberShipChangeCallback;
 	private NetWork netWork;
-	
+
 	public SystemVSM(int groupIdx, long myNodeID, LogStorage logStorage, NetWork netWork, MembershipChangeCallback membershipChangeCallback) {
 		this.smID = Def.SYSTEM_V_SMID;
 		this.myGroupIdx = groupIdx;
@@ -68,10 +65,11 @@ public class SystemVSM implements InsideSM {
 			this.systemVariables = new SystemVariables();
 			this.systemVariables.setGid(0);
 			this.systemVariables.setVersion(-1);
-			logger.info("variables not exist.");
+			logger.info("variables not exist, group idx {}.", this.myGroupIdx);
 		} else {
 			this.releshNodeID();
-			logger.info("OK, groupidx {} gid {} version {}.", this.myGroupIdx, this.systemVariables.getGid(), this.systemVariables.getVersion());
+			logger.info("OK, group idx {} gid {} version {}.",
+					this.myGroupIdx, this.systemVariables.getGid(), this.systemVariables.getVersion());
 		}
 	}
 
@@ -109,20 +107,27 @@ public class SystemVSM implements InsideSM {
 			return false;
 		}
 
+		Integer smret = null;
+		if (smCtx != null && smCtx.getpCtx() != null) {
+			smret = ((JavaOriTypeWrapper<Integer> ) smCtx.getpCtx()).getValue();
+		}
+
 		if (this.systemVariables.getGid() != 0 && variables.getGid() != this.systemVariables.getGid()) {
-			logger.error("modify.gid {} not equal to now.gid {}.", variables.getGid(), this.systemVariables.getGid());
-			if (smCtx != null && smCtx.getpCtx() != null) {
-				smCtx.setpCtx(PaxosNodeFunctionRet.Paxos_MembershipOp_GidNotSame.getRet());
+			logger.error("modify.gid {} not equal to now.gid {}. instanceID {}, groupId {}.", variables.getGid(), this.systemVariables.getGid(), instanceID, groupIdx);
+			if (smret != null) {
+				smret = PaxosNodeFunctionRet.Paxos_MembershipOp_GidNotSame.getRet();
+				((JavaOriTypeWrapper<Integer>) smCtx.getpCtx()).setValue(smret);
+				return true;
 			}
-			return true;
 		}
 
 		if (variables.getVersion() != this.systemVariables.getVersion()) {
-			logger.error("modify.version {} not equal to now.version {}.", variables.getVersion(), this.systemVariables.getVersion());
-			if (smCtx != null && smCtx.getpCtx() != null) {
-				smCtx.setpCtx(PaxosNodeFunctionRet.Paxos_MembershipOp_VersionConflit.getRet());
+			logger.error("modify.version {} not equal to now.version {}. instanceID {}, groupId {}.", variables.getVersion(), this.systemVariables.getVersion(), instanceID, groupIdx);
+			if (smret != null)  {
+				smret = PaxosNodeFunctionRet.Paxos_MembershipOp_VersionConflit.getRet();
+				((JavaOriTypeWrapper<Integer>) smCtx.getpCtx()).setValue(smret);
+				return true;
 			}
-			return true;
 		}
 
 		variables.setVersion(instanceID);
@@ -131,10 +136,10 @@ public class SystemVSM implements InsideSM {
 			return false;
 		}
 
-		logger.error("OK, new version {} gid {}.", this.systemVariables.getVersion(), this.systemVariables.getGid());
+		logger.error("OK, new version {} gid {}. instanceID {}, groupId {}.", this.systemVariables.getVersion(), this.systemVariables.getGid(), instanceID, groupIdx);
 
-		if (smCtx != null && smCtx.getpCtx() != null) {
-			smCtx.setpCtx(0);
+		if (smret != null) {
+			((JavaOriTypeWrapper<Integer>) smCtx.getpCtx()).setValue(0);
 		}
 
 		return true;
@@ -244,6 +249,7 @@ public class SystemVSM implements InsideSM {
 			return updateCpRet;
 		}
 
+		logger.info("SystemVariables update by checkpoint, modify.gid {}, groupId {}.", variables.getGid(), myGroupIdx);
 		logger.info("ok, cp.version {} cp.membercount {} old.version {} old.memebercount {}.",
 				variables.getVersion(), variables.getMembershipSize(), oldVariables.getVersion(), oldVariables.getMembershipSize());
 
@@ -269,7 +275,8 @@ public class SystemVSM implements InsideSM {
 			}
 		}
 		if (netWork != null) {
-			logger.info("tcp handler set check node members {}",members.size());
+			logger.info("tcp handler set check node members {}", members.size());
+			logger.info("tcp handler set check node members info {}", members);
 			netWork.setCheckNode(myGroupIdx, members);
 		}
 		if (this.memberShipChangeCallback != null) {
@@ -359,6 +366,19 @@ public class SystemVSM implements InsideSM {
 			return;
 		}
 
+		this.nodeIDSet.clear();
+		this.systemVariables.clearMembership();
+
+		for (NodeInfo nodeInfo : nodeInfoList) {
+			PaxosNodeInfo paxosNodeInfo = new PaxosNodeInfo();
+			paxosNodeInfo.setRid(0);
+			paxosNodeInfo.setNodeID(nodeInfo.getNodeID());
+			this.systemVariables.addMemberShip(paxosNodeInfo);
+		}
+		releshNodeID();
+	}
+
+	public void flashNodeIDList(ArrayList<NodeInfo> nodeInfoList) {
 		this.nodeIDSet.clear();
 		this.systemVariables.clearMembership();
 

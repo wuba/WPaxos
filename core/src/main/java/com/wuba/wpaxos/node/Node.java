@@ -15,6 +15,7 @@
  */
 package com.wuba.wpaxos.node;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.logging.log4j.LogManager;
@@ -74,7 +75,19 @@ public abstract class Node {
 	 */
     public abstract ProposeResult propose(int groupIdx, byte[] sValue);
 
-    /**
+	/**
+	 *
+	 * @param groupIdx
+	 * @param sValue
+	 * @param instanceIdWrap
+	 * @param poSMCtx
+	 * @param timeout
+	 * @return
+	 */
+	public abstract ProposeResult propose(int groupIdx, byte[] sValue, JavaOriTypeWrapper<Long> instanceIdWrap, SMCtx poSMCtx, int timeout);
+
+
+	/**
      * paxos propose
      * @param groupIdx
      * @param sValue
@@ -272,6 +285,8 @@ public abstract class Node {
      */
     public abstract int setMasterLease(int groupIdx, int leaseTimeMs);
 
+	public abstract int setMasterElectionPriority(int groupIdx, int electionPriority);
+
     /**
      * drop master
      * @param groupIdx
@@ -342,6 +357,13 @@ public abstract class Node {
      */
     public abstract void stopPaxos();
 
+	/**
+	 * reset paxos node
+	 * @param groupIndex
+	 * @param nodeList
+	 */
+	public abstract void resetPaxosNode(int groupIndex, ArrayList<NodeInfo> nodeList);
+
     /**
      * get master manager
      * @param groupIdx
@@ -361,4 +383,11 @@ public abstract class Node {
 	 * @return
 	 */
 	public abstract boolean isLearning(int groupIdx);
+
+	/**
+	 * get now instance id
+	 * @param groupIdx
+	 * @return
+	 */
+	public abstract long getNowInstanceId(int groupIdx);
 }

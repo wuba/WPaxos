@@ -15,8 +15,7 @@
  */
 package com.wuba.wpaxos.comm;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 
 import com.wuba.wpaxos.comm.breakpoint.Breakpoint;
 import com.wuba.wpaxos.comm.enums.IndexType;
@@ -86,6 +85,11 @@ public class Options {
 	//required
 	//All nodes's ip/port with a paxos set(usually three or five nodes).
 	private List<NodeInfo> nodeInfoList = new ArrayList<NodeInfo>();
+
+
+	// 分组节点映射信息
+	private Map<Integer, ArrayList<NodeInfo>> nodeInfoMap = new HashMap<>();
+
 
 	//optional
 	//Only bUseMembership == true, we use option's nodeinfolist to init paxos membership,
@@ -208,6 +212,11 @@ public class Options {
 	//paxosLogCleanType
 	//Default is cleanByHoldCount
 	private PaxosLogCleanType paxosLogCleanType = PaxosLogCleanType.cleanByHoldCount;
+
+	/**
+	 * 不开启master选举
+	 */
+	private Set<Integer> noUseMasterGroups = new HashSet<Integer>();
 
 	public IndexType getIndexType() {
 		return indexType;
@@ -471,5 +480,39 @@ public class Options {
 
 	public void setPaxosLogCleanType(PaxosLogCleanType paxosLogCleanType) {
 		this.paxosLogCleanType = paxosLogCleanType;
+	}
+
+	public boolean isEnableMasterElection(int group) {
+		if (this.noUseMasterGroups != null && this.noUseMasterGroups.contains(group)) {
+			return false;
+		}
+
+		return true;
+	}
+
+	public void enableMasterElection(int group) {
+		if (this.noUseMasterGroups != null) {
+			this.noUseMasterGroups.remove(group);
+		}
+	}
+
+	public void disableMasterElection(int group) {
+		if (this.noUseMasterGroups == null) {
+			this.noUseMasterGroups = new HashSet<Integer>();
+		}
+
+		this.noUseMasterGroups.add(group);
+	}
+
+	public void setNoUseMasterGroups(Set<Integer> noUseMasterGroups) {
+		this.noUseMasterGroups = noUseMasterGroups;
+	}
+
+	public Map<Integer, ArrayList<NodeInfo>> getNodeInfoMap() {
+		return nodeInfoMap;
+	}
+
+	public void setNodeInfoMap(Map<Integer, ArrayList<NodeInfo>> nodeInfoMap) {
+		this.nodeInfoMap = nodeInfoMap;
 	}
 }
