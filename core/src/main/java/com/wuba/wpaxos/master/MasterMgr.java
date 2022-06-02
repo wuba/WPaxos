@@ -117,7 +117,7 @@ public class MasterMgr extends Thread {
 		    try {
 			    Thread.sleep(needSleepTime + this.electionPriority);
 		    } catch (InterruptedException e) {
-			    e.printStackTrace();
+			    logger.error(e.getMessage(), e);
 		    }
     	}
     }
