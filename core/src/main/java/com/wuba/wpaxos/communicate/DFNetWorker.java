@@ -47,17 +47,17 @@ import java.util.concurrent.atomic.AtomicLong;
  * 默认网络通信实现
  */
 public class DFNetWorker extends NetWork {
-	private final Logger logger = LogManager.getLogger(DFNetWorker.class); 
-	
+	private final Logger logger = LogManager.getLogger(DFNetWorker.class);
+
 	private TcpServer tcpServer = null;
 	private UdpServer udpServer = null;
 	private List<TcpWriteHandler> tcpWriteHandlerList = new ArrayList<TcpWriteHandler>();
 	private List<UdpWriteHandler> udpWriteHandlerList = new ArrayList<UdpWriteHandler>();
 	private static volatile DFNetWorker instance = null;
 	private static Object lock = new Object();
-	
+
 	private DFNetWorker() {}
-	
+
 	public static DFNetWorker getInstance() {
 		if (instance == null) {
 			synchronized(lock) {
@@ -77,15 +77,15 @@ public class DFNetWorker extends NetWork {
 		serverConfig.setsListenIp(options.getMyNode().getIp());
 		serverConfig.setListenPort(options.getMyNode().getPort());
 		serverConfig.setNetwork(this);
-		
+
 		if (iOThreadCount <= 1) {
 			iOThreadCount = 1;
 		}
-		
+
 		try {
 			this.tcpServer = new TcpServer(serverConfig);
 			this.udpServer = new UdpServer(serverConfig);
-			
+
 			for (int i = 0; i < iOThreadCount; i++) {
 				this.tcpWriteHandlerList.add(new TcpWriteHandler("TcpWriteHandler_" + i, clientConfig, options));
 				this.udpWriteHandlerList.add(new UdpWriteHandler("UdpWriteHandler_" + i));
@@ -120,24 +120,24 @@ public class DFNetWorker extends NetWork {
 		try {
 			this.tcpServer.stop();
 			this.udpServer.stop();
-			
+
 			for (TcpWriteHandler tcpHandler : this.tcpWriteHandlerList) {
 				tcpHandler.shutdown();
 			}
-			
+
 			for (UdpWriteHandler udpHandler : this.udpWriteHandlerList) {
 				udpHandler.shutdown();
 			}
 		} catch (Exception e) {
 			logger.error("DFNetWorker stopNetWork error.", e);
-		}	
+		}
 	}
 
 	@Override
 	public int sendMessageTCP(int groupIdx, String ip, int port, byte[] message) {
 		try {
-			int idx = groupIdx % this.tcpWriteHandlerList.size();
-			TcpWriteHandler tcpWriteHandler = this.tcpWriteHandlerList.get(idx);
+			int index = getTcpHandlerByGroupId(groupIdx);
+			TcpWriteHandler tcpWriteHandler = this.tcpWriteHandlerList.get(index);
 			SendWindow sendWd = new SendWindow();
 			sendWd.setIp(ip);
 			sendWd.setPort(port);
@@ -145,20 +145,20 @@ public class DFNetWorker extends NetWork {
 			sendWd.setSendSize(message.length);
 			sendWd.setGroupId(groupIdx);
 			sendWd.setTimestamp(System.currentTimeMillis());
-			
+
 			return tcpWriteHandler.offer(sendWd) ? 0 : -1;
 		} catch (Exception e) {
 			logger.error("DFNetWorker sendMessageTCP error.", e);
 		}
-		
+
 		return -1;
 	}
 
 	@Override
 	public int sendMessageUDP(int groupIdx, String ip, int port, byte[] message) {
 		try {
-			int idx = groupIdx % this.udpWriteHandlerList.size();
-			UdpWriteHandler ucpWriteHandler = this.udpWriteHandlerList.get(idx);
+			int index = getUdpHandlerByGroupId(groupIdx);
+			UdpWriteHandler udpWriteHandler = this.udpWriteHandlerList.get(index);
 			SendWindow sendWd = new SendWindow();
 			sendWd.setIp(ip);
 			sendWd.setPort(port);
@@ -166,20 +166,34 @@ public class DFNetWorker extends NetWork {
 			sendWd.setSendSize(message.length);
 			sendWd.setGroupId(groupIdx);
 			sendWd.setTimestamp(System.currentTimeMillis());
-			
-			return ucpWriteHandler.offer(sendWd) ? 0 : -1;
+
+			return udpWriteHandler.offer(sendWd) ? 0 : -1;
 		} catch (Exception e) {
 			logger.error("DFNetWorker sendMessageUDP error.", e);
 		}
-		
+
 		return -1;
 	}
 
 	@Override
 	public void setCheckNode(int group, Set<NodeInfo> nodeInfos){
-		int index = group % this.tcpWriteHandlerList.size();
+		int index = getTcpHandlerByGroupId(group);
 		TcpWriteHandler tcpWriteHandler = this.tcpWriteHandlerList.get(index);
 		tcpWriteHandler.setCheckNodeSet(nodeInfos);
+	}
+
+	/**
+	 * 根据 当前group 获取对应的 handler
+	 *
+	 * @param group groupId
+	 * @return
+	 */
+	private int getTcpHandlerByGroupId(int group) {
+		return group % tcpWriteHandlerList.size();
+	}
+
+	private int getUdpHandlerByGroupId(int group) {
+		return group % udpWriteHandlerList.size();
 	}
 }
 

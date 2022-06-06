@@ -81,7 +81,7 @@ public class PNode extends Node {
 
 		// build masterlist
 		for (int groupIdx = 0; groupIdx < options.getGroupCount(); groupIdx++) {
-			MasterMgr master = new MasterMgr(this, groupIdx, logStorage, options.getMasterChangeCallback());
+			MasterMgr master = new MasterMgr(this, groupIdx, logStorage, options.getMasterChangeCallback(), options);
 			master.setName("MasterMgr-" + groupIdx);
 			masterList.add(master);
 
@@ -136,6 +136,43 @@ public class PNode extends Node {
 		runProposeBatch();
 
 		logger.info("PNode init success.");
+		return 0;
+	}
+
+
+	@Override
+	public void resetPaxosNode(int groupIndex, ArrayList<NodeInfo> nodeList) {
+		for (Group group : this.groupList) {
+			if (group.getConfig().getMyGroupIdx() == groupIndex ) {
+				logger.info("restart init system vsm");
+				try {
+					group.getConfig().flashNodeList(nodeList);
+				} catch (Exception exception) {
+					logger.info("group init error",exception);
+				}
+			}
+		}
+	}
+
+	@Override
+	public ProposeResult propose(int groupIdx, byte[] sValue, JavaOriTypeWrapper<Long> instanceIdWrap, SMCtx smCtx, int timeout) {
+		if (!checkGroupID(groupIdx)) {
+			logger.error("message groupid {} wrong, groupsize {}.", groupIdx, groupList.size());
+			return new ProposeResult(PaxosNodeFunctionRet.Paxos_GroupIdxWrong.getRet(), instanceIdWrap.getValue());
+		}
+
+		CommitResult commitRet = groupList.get(groupIdx).getCommitter().newValueGetID(sValue, instanceIdWrap, smCtx, timeout);
+		return new ProposeResult(commitRet.getCommitRet(), commitRet.getSuccInstanceID());
+	}
+
+	@Override
+	public int setMasterElectionPriority(int groupIdx, int electionPriority) {
+		if (!checkGroupID(groupIdx)) {
+			logger.error("message groupid {} wrong, groupsize {}.", groupIdx, groupList.size());
+			return PaxosNodeFunctionRet.Paxos_GroupIdxWrong.getRet();
+		}
+
+		masterList.get(groupIdx).setElectionPriority(electionPriority);
 		return 0;
 	}
 
@@ -680,7 +717,7 @@ public class PNode extends Node {
 		}
 
 		SMCtx ctx = new SMCtx();
-		int smret = -1;
+		JavaOriTypeWrapper<Integer> smret = new JavaOriTypeWrapper<>(-1);
 		ctx.setSmId(Def.SYSTEM_V_SMID);
 		ctx.setpCtx(smret);
 
@@ -689,7 +726,7 @@ public class PNode extends Node {
 			return pResult;
 		}
 
-		pResult.setResult((Integer) ctx.getpCtx());
+		pResult.setResult(((JavaOriTypeWrapper<Integer>) ctx.getpCtx()).getValue());
 		return pResult;
 	}
 
@@ -744,6 +781,11 @@ public class PNode extends Node {
 			return false;
 		}
 		return groupList.get(groupIdx).getInstance().isLearning();
+	}
+
+	@Override
+	public long getNowInstanceId(int groupIdx) {
+		return groupList.get(groupIdx).getInstance().getNowInstanceID();
 	}
 }
 

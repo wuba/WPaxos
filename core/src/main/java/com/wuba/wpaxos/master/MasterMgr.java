@@ -15,6 +15,7 @@
  */
 package com.wuba.wpaxos.master;
 
+import com.wuba.wpaxos.comm.Options;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -33,14 +34,17 @@ import com.wuba.wpaxos.utils.OtherUtils;
 public class MasterMgr extends Thread {
 	private final Logger logger = LogManager.getLogger(MasterMgr.class); 
 	private int leaseTime;
+	private int electionPriority;
     private boolean isEnd;
     private boolean isStarted;
     private int myGroupIdx;
     private boolean needDropMaster;
     private Node paxosNode;
     private MasterStateMachine defaultMasterSM;
-    
-    public MasterMgr(Node paxosNode, int groupIdx, LogStorage logStorage, MasterChangeCallback masterChangeCallback) {
+	private Options options;
+
+
+	public MasterMgr(Node paxosNode, int groupIdx, LogStorage logStorage, MasterChangeCallback masterChangeCallback, Options options) {
 		defaultMasterSM = new MasterStateMachine(logStorage, paxosNode.getMyNodeID(), groupIdx, masterChangeCallback);
 		leaseTime = 10000;
 		this.paxosNode = paxosNode;
@@ -48,8 +52,10 @@ public class MasterMgr extends Thread {
 		this.isEnd = false;
 		this.isStarted = false;
 		this.needDropMaster = false;
+		this.options = options;
+		this.electionPriority = 0;
 	}
-    
+
     public void runMaster() {
     	start();
     }
@@ -78,7 +84,17 @@ public class MasterMgr extends Thread {
     			logger.info("MasterMgr stop..., groupid : {}.", this.myGroupIdx);
     			return;
     		}
-    		
+
+		    if (!options.isEnableMasterElection(myGroupIdx)) {
+			    logger.debug("MasterMgr groupId: {} not enable master election", myGroupIdx);
+			    try {
+				    Thread.sleep(1000);
+			    } catch (InterruptedException e) {
+				    logger.error(e.getMessage(), e);
+			    }
+			    continue;
+		    }
+
     		int nLeaseTime = this.leaseTime;
     		long beginTime = System.currentTimeMillis();
     		
@@ -97,14 +113,22 @@ public class MasterMgr extends Thread {
     		int runTime = (int) (endTime > beginTime ? (endTime - beginTime) : 0);
     		int needSleepTime = continueLeaseTimeout > runTime ? (continueLeaseTimeout - runTime) : 0;
 
-    		logger.debug("TryBeMaster, sleep time {}.", needSleepTime);
-    		try {
-				Thread.sleep(needSleepTime);
-			} catch (InterruptedException e) {
-				logger.error(e.getMessage(), e);
-			}
+		    logger.debug("TryBeMaster, sleep time {}.", needSleepTime + this.electionPriority);
+		    try {
+			    Thread.sleep(needSleepTime + this.electionPriority);
+		    } catch (InterruptedException e) {
+			    logger.error(e.getMessage(), e);
+		    }
     	}
     }
+
+	public int getElectionPriority() {
+		return electionPriority;
+	}
+
+	public void setElectionPriority(int electionPriority) {
+		this.electionPriority = electionPriority;
+	}
 
     public void setLeaseTime(int leaseTimeMs) {
     	if (leaseTimeMs < 1000) {

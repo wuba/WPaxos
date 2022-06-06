@@ -103,6 +103,10 @@ public class Config {
 		logger.info("config init success");
 	}
 
+	public void flashNodeList(ArrayList<NodeInfo> nodeList){
+		this.systemVSM.flashNodeIDList(nodeList);
+	}
+
 	public boolean checkConfig() {
 		if(!this.systemVSM.isIMInMembership()) {
 			logger.error("my node={} is not in membership", this.myNodeID);

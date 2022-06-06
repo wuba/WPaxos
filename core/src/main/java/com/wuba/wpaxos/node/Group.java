@@ -33,7 +33,7 @@ import com.wuba.wpaxos.storemachine.StateMachine;
 /**
  * paxos group封装
  */
-public class Group {	
+public class Group {
 	private final Logger logger = LogManager.getLogger(Group.class);
     private Communicate communicate;
     private Config config;
@@ -42,10 +42,10 @@ public class Group {
     private Thread thread;
     
     public Group(LogStorage logStorage, NetWork netWork, InsideSM masterSM, int groupIdx, Options options) {
-    	this.config = new Config(logStorage, options.isWriteSync(), options.getSyncInterval(), options.isUseMembership(),
-    			options.getMyNode(), options.getNodeInfoList(), options.getFollowerNodeInfoList(),
-    			groupIdx, options.getGroupCount(), options.getMembershipChangeCallback(), options.getPaxosLogCleanType(),
-    			options.getLearnerSendSpeed(),netWork);
+	    this.config = new Config(logStorage, options.isWriteSync(), options.getSyncInterval(), options.isUseMembership(),
+			    options.getMyNode(), options.getNodeInfoMap().get(groupIdx), options.getFollowerNodeInfoList(),
+			    groupIdx, options.getGroupCount(), options.getMembershipChangeCallback(), options.getPaxosLogCleanType(),
+			    options.getLearnerSendSpeed(),netWork);
     	this.config.setPrepareTimeout(options.getPrepareTimeout());
     	this.config.setAcceptTimeout(options.getAcceptTimeout());
     	this.config.setAskForLearnTimeout(options.getAskForLearnTimeout());
