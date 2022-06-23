@@ -81,6 +81,16 @@ public abstract class Node {
 	 * @param sValue
 	 * @param instanceIdWrap
 	 * @param poSMCtx
+	 * @return
+	 */
+	public abstract ProposeResult propose(int groupIdx, byte[] sValue, JavaOriTypeWrapper<Long> instanceIdWrap, SMCtx poSMCtx);
+
+	/**
+	 *
+	 * @param groupIdx
+	 * @param sValue
+	 * @param instanceIdWrap
+	 * @param poSMCtx
 	 * @param timeout
 	 * @return
 	 */

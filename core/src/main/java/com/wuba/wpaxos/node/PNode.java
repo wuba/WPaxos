@@ -155,6 +155,17 @@ public class PNode extends Node {
 	}
 
 	@Override
+	public ProposeResult propose(int groupIdx, byte[] sValue, JavaOriTypeWrapper<Long> instanceIdWrap, SMCtx smCtx) {
+		if (!checkGroupID(groupIdx)) {
+			logger.error("message groupid {} wrong, groupsize {}.", groupIdx, groupList.size());
+			return new ProposeResult(PaxosNodeFunctionRet.Paxos_GroupIdxWrong.getRet(), instanceIdWrap.getValue());
+		}
+
+		CommitResult commitRet = groupList.get(groupIdx).getCommitter().newValueGetID(sValue, instanceIdWrap, smCtx);
+		return new ProposeResult(commitRet.getCommitRet(), commitRet.getSuccInstanceID());
+	}
+
+	@Override
 	public ProposeResult propose(int groupIdx, byte[] sValue, JavaOriTypeWrapper<Long> instanceIdWrap, SMCtx smCtx, int timeout) {
 		if (!checkGroupID(groupIdx)) {
 			logger.error("message groupid {} wrong, groupsize {}.", groupIdx, groupList.size());
