@@ -250,7 +250,11 @@ public class DefaultDataBase implements DataBase {
 			logger.info("TRACE put valueStore cost :" + cost);
 		}
 
-		if (pdr == null || pdr.getPutDataStatus() != PutDataStatus.PUT_OK) {
+		if (pdr == null) {
+			return -1;
+		}
+		
+		if (pdr.getPutDataStatus() != PutDataStatus.PUT_OK) {
 			logger.error("put value failed, status=" + pdr.getPutDataStatus());
 			return -1;
 		}
