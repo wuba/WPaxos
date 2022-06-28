@@ -14,7 +14,7 @@
         <log4j.version>2.17.1</log4j.version>
         <netty.version>3.9.9.Final</netty.version>
         <guava.version>29.0-jre</guava.version>
-        <fastjson.verison>1.2.53</fastjson.verison>
+        <fastjson.verison>1.2.83</fastjson.verison>
         <jna.verison>5.0.0</jna.verison>
         <leveldb-api.verison>0.10</leveldb-api.verison>
         <leveldbjni-all.version>1.8</leveldbjni-all.version>
