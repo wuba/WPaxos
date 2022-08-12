@@ -72,6 +72,14 @@ group数量大于等于3时，master均匀分布于集群3个节点，每个grou
 | 100B | 100 | 37830 | 42015 |  
 
 ## 快速使用
+maven依赖
+```
+<dependency>
+    <groupId>io.github.wuba</groupId>
+    <artifactId>wpaxos.core</artifactId>
+    <version>1.0.0</version>
+</dependency>
+```
 下面以sample中的echo为例，说明如何快速使用WPaxos，构建WPaxos集群有以下三个关键步骤：构建状态机、构建上下文信息和初始化WPaxos实例。
 #### 创建状态机
 首先，状态机为WPaxos数据的最终处理逻辑，instance数据一旦被状态机执行，不会再被修改，集群中所有节点只要初始状态一致，那么状态机最终的状态也保持一致。这里我们实现一个状态机叫EchoSM，该类继承StateMachine，如下： 
@@ -336,7 +344,7 @@ paxosNode.removeMember(groupIdx, node);
 WPaxos 基于 [Apache License 2.0](./LICENSE) 开源协议，源码中引用了开源协议同为 Apache License 2.0 的[Apache RocketMQ](https://github.com/apache/rocketmq/tree/master/store)存储部分关于文件管理相关的代码。
 
 ## 联系我们  
-<img src="img/wpaxos-wechat.jpg"/>  
-欢迎添加wpaxos助手微信账号，加入wpaxos技术讨论群~
+<img src="img/wpaxos-wechat.png"/>  
+欢迎添加58技术微信账号，加入WPaxos技术讨论群~
 
 

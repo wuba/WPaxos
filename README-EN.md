@@ -66,6 +66,15 @@ The following is the performance comparison between Leveldb index and file index
 | 100B | 100 | 37830 | 42015 |  
 
 ## Quick Start  
+Maven dependency :  
+```
+<dependency>
+    <groupId>io.github.wuba</groupId>
+    <artifactId>wpaxos.core</artifactId>
+    <version>1.0.0</version>
+</dependency>
+```
+
 We will take echo as an example to show you how to use WPaxos quickly.There are three important steps in building a WPaxos cluster: building state machines, building context, and initializing a WPaxos instance.
 
 #### Building state machines  
@@ -315,5 +324,5 @@ Thanks to the [Apache RocketMQ](https://github.com/apache/rocketmq) team for the
 WPaxos is licensed under the [Apache License 2.0](./LICENSE).The source code has referenced to the file management part implement of Apache rocketmq storage, whose open license also is the Apache  License 2.0.
 
 ## Contact  
-<img src="img/wpaxos-wechat.jpg"/>  
+<img src="img/wpaxos-wechat.png"/>  
 Welcome to add the wechat account of wpaxos assistant and join the wpaxos Technology Group for further communication.
