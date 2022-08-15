@@ -5,6 +5,10 @@
     <artifactId>wpaxos</artifactId>
     <packaging>pom</packaging>
     <version>1.0.0</version>
+    <name>WPaxos</name>
+    <description>A production-grade java implementation of paxos consensus algorithm.</description>
+    <url>https://github.com/wuba/WPaxos</url>
+
     <modules>
         <module>core</module>
         <module>sample</module>
