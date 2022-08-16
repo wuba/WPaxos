@@ -77,7 +77,7 @@ maven依赖
 <dependency>
     <groupId>io.github.wuba</groupId>
     <artifactId>wpaxos.core</artifactId>
-    <version>1.0.0</version>
+    <version>1.0.0-Release</version>
 </dependency>
 ```
 下面以sample中的echo为例，说明如何快速使用WPaxos，构建WPaxos集群有以下三个关键步骤：构建状态机、构建上下文信息和初始化WPaxos实例。
