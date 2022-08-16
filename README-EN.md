@@ -71,7 +71,7 @@ Maven dependency :
 <dependency>
     <groupId>io.github.wuba</groupId>
     <artifactId>wpaxos.core</artifactId>
-    <version>1.0.0</version>
+    <version>1.0.0-Release</version>
 </dependency>
 ```
 
