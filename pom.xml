@@ -4,7 +4,7 @@
     <groupId>io.github.wuba</groupId>
     <artifactId>wpaxos</artifactId>
     <packaging>pom</packaging>
-    <version>1.0.0</version>
+    <version>1.0.1</version>
     <name>WPaxos</name>
     <description>A production-grade java implementation of paxos consensus algorithm.</description>
     <url>https://github.com/wuba/WPaxos</url>
