@@ -14,7 +14,7 @@
         <module>sample</module>
     </modules>
     <properties>
-        <protobuf.verison>3.16.1</protobuf.verison>
+        <protobuf.verison>3.16.3</protobuf.verison>
         <log4j.version>2.17.1</log4j.version>
         <netty.version>3.9.9.Final</netty.version>
         <guava.version>29.0-jre</guava.version>
