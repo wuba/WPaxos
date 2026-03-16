@@ -29,52 +29,52 @@
             <dependency>
                 <groupId>com.google.protobuf</groupId>
                 <artifactId>protobuf-java</artifactId>
-                <version>${protobuf.verison}</version>
+                <version>3.25.5</version>
             </dependency>
             <dependency>
                 <groupId>org.apache.logging.log4j</groupId>
                 <artifactId>log4j-api</artifactId>
-                <version>${log4j.version}</version>
+                <version>2.17.1</version>
             </dependency>
             <dependency>
                 <groupId>org.apache.logging.log4j</groupId>
                 <artifactId>log4j-core</artifactId>
-                <version>${log4j.version}</version>
+                <version>2.17.1</version>
             </dependency>
             <dependency>
                 <groupId>io.netty</groupId>
                 <artifactId>netty</artifactId>
-                <version>${netty.version}</version>
+                <version>3.9.9.Final</version>
             </dependency>
             <dependency>
                 <groupId>com.google.guava</groupId>
                 <artifactId>guava</artifactId>
-                <version>${guava.version}</version>
+                <version>32.0.1-jre</version>
             </dependency>
             <dependency>
                 <groupId>com.alibaba</groupId>
                 <artifactId>fastjson</artifactId>
-                <version>${fastjson.verison}</version>
+                <version>1.2.83_noneautotype</version>
             </dependency>
             <dependency>
                 <groupId>net.java.dev.jna</groupId>
                 <artifactId>jna</artifactId>
-                <version>${jna.verison}</version>
+                <version>5.0.0</version>
             </dependency>
             <dependency>
                 <groupId>org.iq80.leveldb</groupId>
                 <artifactId>leveldb-api</artifactId>
-                <version>${leveldb-api.verison}</version>
+                <version>0.10</version>
             </dependency>
             <dependency>
                 <groupId>org.fusesource.leveldbjni</groupId>
                 <artifactId>leveldbjni-all</artifactId>
-                <version>${leveldbjni-all.version}</version>
+                <version>1.8</version>
             </dependency>
             <dependency>
                 <groupId>org.rocksdb</groupId>
                 <artifactId>rocksdbjni</artifactId>
-                <version>${rocksdbjni.verison}</version>
+                <version>5.15.10</version>
             </dependency>
         </dependencies>
     </dependencyManagement>
