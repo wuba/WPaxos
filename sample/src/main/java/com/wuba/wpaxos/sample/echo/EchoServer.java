@@ -15,6 +15,12 @@
  */
 package com.wuba.wpaxos.sample.echo;
 
+import java.io.File;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
 import com.wuba.wpaxos.ProposeResult;
 import com.wuba.wpaxos.comm.GroupSMInfo;
 import com.wuba.wpaxos.comm.NodeInfo;
@@ -24,10 +30,6 @@ import com.wuba.wpaxos.config.PaxosTryCommitRet;
 import com.wuba.wpaxos.node.Node;
 import com.wuba.wpaxos.store.config.StoreConfig;
 import com.wuba.wpaxos.storemachine.SMCtx;
-
-import java.io.File;
-import java.util.ArrayList;
-import java.util.List;
 
 public class EchoServer {
 	private NodeInfo myNode;
@@ -57,6 +59,13 @@ public class EchoServer {
 		options.setGroupCount(groupCount);
 		options.setMyNode(this.myNode);
 		options.setNodeInfoList(this.nodeList);
+
+		// fill nodeInfoMap for each group
+		Map<Integer, ArrayList<NodeInfo>> nodeInfoMap = new HashMap<>();
+		for(int gid = 0; gid < groupCount; gid++) {
+			nodeInfoMap.put(gid, new ArrayList<>(this.nodeList));
+		}
+		options.setNodeInfoMap(nodeInfoMap);
 		options.setUseMembership(true);
 		options.setUseBatchPropose(false);
 		options.setIndexType(indexType);
